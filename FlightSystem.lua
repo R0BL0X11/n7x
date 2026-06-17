@@ -1,169 +1,101 @@
--- N7x Flight and High Jump System
--- LocalScript for Roblox
--- Place this in StarterPlayer > StarterPlayerScripts
+local p = game.Players.LocalPlayer
+local pg = p:WaitForChild("PlayerGui")
+local m = Instance.new("ScreenGui", pg)
+m.ResetOnSpawn = false
 
-local Players = game:GetService("Players")
-local UserInputService = game:GetService("UserInputService")
-local RunService = game:GetService("RunService")
+local h = Instance.new("Frame", m)
+h.Size = UDim2.new(0, 200, 0, 150)
+h.Position = UDim2.new(0.5, -100, 0.5, -75)
+h.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+h.Draggable = true
+h.Active = true
 
-local player = Players.LocalPlayer
-local character = player.Character or player.CharacterAdded:Wait()
-local humanoid = character:WaitForChild("Humanoid")
-local rootPart = character:WaitForChild("HumanoidRootPart")
+local t = Instance.new("TextLabel", h)
+t.Size = UDim2.new(1, 0, 0, 30)
+t.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+t.TextColor3 = Color3.fromRGB(255, 255, 255)
+t.Text = "N7x"
 
--- Variables
-local isFlying = false
-local isHighJump = false
-local flySpeed = 50
-local jumpPower = 100
+local fly_on = false
+local esp_on = false
+local tool_on = false
 
--- Create GUI
-local screenGui = Instance.new("ScreenGui")
-screenGui.Name = "N7xGui"
-screenGui.ResetOnSpawn = false
-screenGui.Parent = player:WaitForChild("PlayerGui")
-
--- Create Button
-local button = Instance.new("TextButton")
-button.Name = "ToggleButton"
-button.Size = UDim2.new(0, 150, 0, 50)
-button.Position = UDim2.new(0.5, -75, 0, 20)
-button.BackgroundColor3 = Color3.fromRGB(0, 100, 255)
-button.TextColor3 = Color3.fromRGB(255, 255, 255)
-button.TextSize = 18
-button.Font = Enum.Font.GothamBold
-button.Text = "تشغيل"
-button.Parent = screenGui
-
--- Create Status Label
-local statusLabel = Instance.new("TextLabel")
-statusLabel.Name = "StatusLabel"
-statusLabel.Size = UDim2.new(0, 200, 0, 40)
-statusLabel.Position = UDim2.new(0.5, -100, 0, 80)
-statusLabel.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-statusLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-statusLabel.TextSize = 14
-statusLabel.Font = Enum.Font.Gotham
-statusLabel.Text = "الحالة: معطل"
-statusLabel.Parent = screenGui
-
--- Flying variables
-local bodyVelocity
-local bodyGyro
-
--- Function to start flying
-local function startFlying()
-    if isFlying then return end
-    isFlying = true
-    
-    -- Create BodyVelocity for movement
-    bodyVelocity = Instance.new("BodyVelocity")
-    bodyVelocity.Velocity = Vector3.new(0, 0, 0)
-    bodyVelocity.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
-    bodyVelocity.Parent = rootPart
-    
-    -- Create BodyGyro for rotation
-    bodyGyro = Instance.new("BodyGyro")
-    bodyGyro.MaxTorque = Vector3.new(math.huge, math.huge, math.huge)
-    bodyGyro.CFrame = rootPart.CFrame
-    bodyGyro.Parent = rootPart
-    
-    button.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
-    button.Text = "إيقاف"
-    statusLabel.Text = "الحالة: الطيران مفعل ✈️"
+local function btn(name, pos)
+    local b = Instance.new("TextButton", h)
+    b.Size = UDim2.new(1, 0, 0, 40)
+    b.Position = UDim2.new(0, 0, 0, pos)
+    b.BackgroundColor3 = Color3.fromRGB(100, 0, 0)
+    b.TextColor3 = Color3.fromRGB(255, 255, 255)
+    b.Text = name
+    return b
 end
 
--- Function to stop flying
-local function stopFlying()
-    if not isFlying then return end
-    isFlying = false
-    
-    if bodyVelocity then
-        bodyVelocity:Destroy()
-        bodyVelocity = nil
-    end
-    if bodyGyro then
-        bodyGyro:Destroy()
-        bodyGyro = nil
-    end
-    
-    button.BackgroundColor3 = Color3.fromRGB(0, 100, 255)
-    button.Text = "تشغيل"
-    statusLabel.Text = "الحالة: معطل"
-end
+local fly_btn = btn("طيران", 30)
+local esp_btn = btn("ESP", 70)
+local tool_btn = btn("Tools", 110)
 
--- Function to activate high jump
-local function activateHighJump()
-    if isHighJump then return end
-    isHighJump = true
-    humanoid.JumpPower = jumpPower
-    statusLabel.Text = "الحالة: القفز العالي مفعل 🚀"
-end
-
--- Function to deactivate high jump
-local function deactivateHighJump()
-    if not isHighJump then return end
-    isHighJump = false
-    humanoid.JumpPower = 50 -- Default jump power
-    statusLabel.Text = "الحالة: معطل"
-end
-
--- Button click event
-button.MouseButton1Click:Connect(function()
-    if not isFlying and not isHighJump then
-        startFlying()
-        activateHighJump()
-    else
-        stopFlying()
-        deactivateHighJump()
+fly_btn.MouseButton1Click:Connect(function()
+    fly_on = not fly_on
+    fly_btn.BackgroundColor3 = fly_on and Color3.fromRGB(0, 255, 0) or Color3.fromRGB(100, 0, 0)
+    if fly_on then
+        local c = p.Character
+        local r = c:WaitForChild("HumanoidRootPart")
+        local h = c:WaitForChild("Humanoid")
+        local bv = Instance.new("BodyVelocity", r)
+        bv.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
+        local bg = Instance.new("BodyGyro", r)
+        bg.MaxTorque = Vector3.new(math.huge, math.huge, math.huge)
+        h.JumpPower = 100
+        
+        local conn
+        conn = game:GetService("RunService").RenderStepped:Connect(function()
+            if not fly_on then conn:Disconnect() bv:Destroy() bg:Destroy() h.JumpPower = 50 return end
+            local m = Vector3.new(0,0,0)
+            local ui = game:GetService("UserInputService")
+            if ui:IsKeyDown(Enum.KeyCode.W) then m = m + workspace.CurrentCamera.CFrame.LookVector end
+            if ui:IsKeyDown(Enum.KeyCode.S) then m = m - workspace.CurrentCamera.CFrame.LookVector end
+            if ui:IsKeyDown(Enum.KeyCode.A) then m = m - workspace.CurrentCamera.CFrame.RightVector end
+            if ui:IsKeyDown(Enum.KeyCode.D) then m = m + workspace.CurrentCamera.CFrame.RightVector end
+            if ui:IsKeyDown(Enum.KeyCode.Space) then m = m + Vector3.new(0,1,0) end
+            if m.Magnitude > 0 then m = m.Unit end
+            bv.Velocity = m * 50
+            bg.CFrame = workspace.CurrentCamera.CFrame
+        end)
     end
 end)
 
--- Flying movement loop
-RunService.RenderStepped:Connect(function()
-    if isFlying and bodyVelocity and bodyGyro then
-        local camera = workspace.CurrentCamera
-        local moveDirection = Vector3.new(0, 0, 0)
-        
-        -- Get input
-        if UserInputService:IsKeyDown(Enum.KeyCode.W) then
-            moveDirection = moveDirection + (camera.CFrame.LookVector * Vector3.new(1, 0, 1)).Unit
+esp_btn.MouseButton1Click:Connect(function()
+    esp_on = not esp_on
+    esp_btn.BackgroundColor3 = esp_on and Color3.fromRGB(0, 255, 0) or Color3.fromRGB(100, 0, 0)
+    for _, player in pairs(game.Players:GetPlayers()) do
+        if player ~= p and player.Character then
+            local esp = player.Character:FindFirstChild("ESP")
+            if esp_on then
+                if not esp then
+                    local box = Instance.new("BillboardGui")
+                    box.Name = "ESP"
+                    box.Size = UDim2.new(4, 0, 5, 0)
+                    box.StudsOffset = Vector3.new(0, 3, 0)
+                    box.Parent = player.Character:FindFirstChild("HumanoidRootPart")
+                    local label = Instance.new("TextLabel", box)
+                    label.Size = UDim2.new(1, 0, 1, 0)
+                    label.BackgroundTransparency = 1
+                    label.TextColor3 = Color3.fromRGB(0, 255, 0)
+                    label.Text = player.Name
+                end
+            else
+                if esp then esp:Destroy() end
+            end
         end
-        if UserInputService:IsKeyDown(Enum.KeyCode.S) then
-            moveDirection = moveDirection - (camera.CFrame.LookVector * Vector3.new(1, 0, 1)).Unit
-        end
-        if UserInputService:IsKeyDown(Enum.KeyCode.A) then
-            moveDirection = moveDirection - camera.CFrame.RightVector
-        end
-        if UserInputService:IsKeyDown(Enum.KeyCode.D) then
-            moveDirection = moveDirection + camera.CFrame.RightVector
-        end
-        if UserInputService:IsKeyDown(Enum.KeyCode.Space) then
-            moveDirection = moveDirection + Vector3.new(0, 1, 0)
-        end
-        if UserInputService:IsKeyDown(Enum.KeyCode.LeftControl) then
-            moveDirection = moveDirection - Vector3.new(0, 1, 0)
-        end
-        
-        -- Normalize and apply speed
-        if moveDirection.Magnitude > 0 then
-            moveDirection = moveDirection.Unit
-        end
-        bodyVelocity.Velocity = moveDirection * flySpeed
-        
-        -- Update rotation
-        bodyGyro.CFrame = camera.CFrame
     end
 end)
 
--- Handle character respawn
-player.CharacterAdded:Connect(function(newCharacter)
-    character = newCharacter
-    humanoid = character:WaitForChild("Humanoid")
-    rootPart = character:WaitForChild("HumanoidRootPart")
-    
-    stopFlying()
-    deactivateHighJump()
+tool_btn.MouseButton1Click:Connect(function()
+    tool_on = not tool_on
+    tool_btn.BackgroundColor3 = tool_on and Color3.fromRGB(0, 255, 0) or Color3.fromRGB(100, 0, 0)
+    if tool_on then
+        for _, tool in pairs(workspace:FindFirstChild("Tools") and workspace.Tools:GetChildren() or {}) do
+            tool:MoveTo(p.Character:WaitForChild("HumanoidRootPart").Position)
+        end
+    end
 end)
-
-print("✅ N7x Flight System Loaded Successfully!")
