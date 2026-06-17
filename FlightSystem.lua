@@ -138,6 +138,7 @@ local function makeInputBox(parent, placeholder, y)
     box.Size = UDim2.new(0.9, 0, 0, 35)
     box.Position = UDim2.new(0.05, 0, 0, y)
     box.PlaceholderText = placeholder
+    box.PlaceholderColor3 = Color3.fromRGB(150, 150, 150)
     box.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
     box.TextColor3 = Color3.fromRGB(255, 255, 255)
     box.TextSize = 11
@@ -155,13 +156,16 @@ local tp_player_btn = makeBtn(leftPanel, "انتقال للاعب", 210)
 
 -- الإعدادات على اليمين
 makeLabel(rightPanel, "السرعة", 10)
-local speedBox = makeInputBox(rightPanel, "مثال: 50", 35)
+local speedBox = makeInputBox(rightPanel, "1-199", 35)
+speedBox.Text = "50"
 
 makeLabel(rightPanel, "قوة النط", 75)
-local jumpBox = makeInputBox(rightPanel, "مثال: 100", 100)
+local jumpBox = makeInputBox(rightPanel, "1-199", 100)
+jumpBox.Text = "100"
 
 makeLabel(rightPanel, "سرعة الطيران", 140)
-local flySpeedBox = makeInputBox(rightPanel, "مثال: 50", 165)
+local flySpeedBox = makeInputBox(rightPanel, "1-199", 165)
+flySpeedBox.Text = "50"
 
 -- حقل البحث في قسم اللاعب
 local searchBox = Instance.new("TextBox", playerLeftPanel)
@@ -204,15 +208,22 @@ end_btn.Text = "إنهاء"
 end_btn.TextSize = 11
 end_btn.BorderSizePixel = 0
 
-local states = {fly = false, noclip = false, esp = false, watch = false}
+local states = {fly = false, noclip = false, esp = false, watch = false, screen = false}
 local cp = nil
 local currentTarget = nil
-local screenActive = false
+local screenLoop = nil
 
 -- المتغيرات الافتراضية
 local flySpeed = 50
 local jumpPower = 100
 local speed = 50
+
+-- دالة للتحقق من الرقم
+local function clampValue(val, min, max)
+    if not val or val < min then return min end
+    if val > max then return max end
+    return math.floor(val)
+end
 
 -- تبديل الأقسام
 cmdBtn.MouseButton1Click:Connect(function()
@@ -241,19 +252,40 @@ closeBtn.MouseButton1Click:Connect(function()
 end)
 
 -- تحديث قيم السرعة
-speedBox:GetPropertyChangedSignal("Text"):Connect(function()
+speedBox.FocusLost:Connect(function()
     local val = tonumber(speedBox.Text)
-    if val then speed = val end
+    if val then
+        val = clampValue(val, 1, 199)
+        speed = val
+        speedBox.Text = tostring(val)
+    else
+        speedBox.Text = "50"
+        speed = 50
+    end
 end)
 
-jumpBox:GetPropertyChangedSignal("Text"):Connect(function()
+jumpBox.FocusLost:Connect(function()
     local val = tonumber(jumpBox.Text)
-    if val then jumpPower = val end
+    if val then
+        val = clampValue(val, 1, 199)
+        jumpPower = val
+        jumpBox.Text = tostring(val)
+    else
+        jumpBox.Text = "100"
+        jumpPower = 100
+    end
 end)
 
-flySpeedBox:GetPropertyChangedSignal("Text"):Connect(function()
+flySpeedBox.FocusLost:Connect(function()
     local val = tonumber(flySpeedBox.Text)
-    if val then flySpeed = val end
+    if val then
+        val = clampValue(val, 1, 199)
+        flySpeed = val
+        flySpeedBox.Text = tostring(val)
+    else
+        flySpeedBox.Text = "50"
+        flySpeed = 50
+    end
 end)
 
 -- طيران
@@ -438,28 +470,50 @@ watch_btn.MouseButton1Click:Connect(function()
     end
 end)
 
--- مشاهدة الشاشة
+-- مشاهدة الشاشة (من وجهة نظر اللاعب)
 screen_btn.MouseButton1Click:Connect(function()
-    if currentTarget and currentTarget.Character then
-        screenActive = true
+    if not currentTarget or not currentTarget.Character then return end
+    
+    states.screen = not states.screen
+    screen_btn.BackgroundColor3 = states.screen and Color3.fromRGB(0, 200, 0) or Color3.fromRGB(50, 50, 50)
+    
+    if states.screen then
         local cam = workspace.CurrentCamera
         local targetRoot = currentTarget.Character:FindFirstChild("HumanoidRootPart")
-        if targetRoot then
-            local loop
-            loop = game:GetService("RunService").RenderStepped:Connect(function()
-                if not screenActive or not currentTarget or not currentTarget.Character then
-                    loop:Disconnect()
+        local targetHum = currentTarget.Character:FindFirstChild("Humanoid")
+        
+        if targetRoot and targetHum then
+            if screenLoop then screenLoop:Disconnect() end
+            
+            screenLoop = game:GetService("RunService").RenderStepped:Connect(function()
+                if not states.screen or not currentTarget or not currentTarget.Character then
+                    if screenLoop then screenLoop:Disconnect() screenLoop = nil end
                     return
                 end
-                cam.CFrame = targetRoot.CFrame + targetRoot.CFrame.LookVector * 5
+                
+                targetRoot = currentTarget.Character:FindFirstChild("HumanoidRootPart")
+                if targetRoot then
+                    cam.CFrame = targetRoot.CFrame * CFrame.new(0, 0, 0)
+                    cam.Focus = targetRoot.CFrame * CFrame.new(0, 0, -1)
+                end
             end)
+        end
+    else
+        if screenLoop then 
+            screenLoop:Disconnect() 
+            screenLoop = nil
         end
     end
 end)
 
 -- إنهاء مشاهدة الشاشة
 end_btn.MouseButton1Click:Connect(function()
-    screenActive = false
+    states.screen = false
+    screen_btn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+    if screenLoop then 
+        screenLoop:Disconnect() 
+        screenLoop = nil
+    end
 end)
 
 print("N7x تم تحميله!")
