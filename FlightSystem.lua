@@ -9,8 +9,8 @@ mainGui.Name = "N7x"
 local circle = Instance.new("TextButton", mainGui)
 circle.Size = UDim2.new(0, 50, 0, 50)
 circle.Position = UDim2.new(0.5, -25, 0.5, -25)
-circle.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
-circle.TextColor3 = Color3.fromRGB(255, 255, 255)
+circle.BackgroundColor3 = Color3.fromRGB(147, 51, 234)
+circle.TextColor3 = Color3.fromRGB(147, 51, 234)
 circle.Text = "N7x"
 circle.TextSize = 14
 circle.BorderSizePixel = 0
@@ -22,7 +22,7 @@ local panel = Instance.new("Frame", mainGui)
 panel.Size = UDim2.new(0, 900, 0, 550)
 panel.Position = UDim2.new(0.5, -450, 0.5, -275)
 panel.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
-panel.BorderColor3 = Color3.fromRGB(0, 255, 0)
+panel.BorderColor3 = Color3.fromRGB(147, 51, 234)
 panel.BorderSizePixel = 2
 panel.Visible = false
 panel.Draggable = true
@@ -31,7 +31,7 @@ panel.Active = true
 -- الرأس
 local header = Instance.new("TextLabel", panel)
 header.Size = UDim2.new(1, 0, 0, 40)
-header.BackgroundColor3 = Color3.fromRGB(0, 150, 0)
+header.BackgroundColor3 = Color3.fromRGB(147, 51, 234)
 header.TextColor3 = Color3.fromRGB(255, 255, 255)
 header.Text = "N7x"
 header.TextSize = 16
@@ -50,7 +50,7 @@ closeBtn.BorderSizePixel = 0
 local cmdBtn = Instance.new("TextButton", panel)
 cmdBtn.Size = UDim2.new(0.5, -5, 0, 35)
 cmdBtn.Position = UDim2.new(0, 5, 0, 45)
-cmdBtn.BackgroundColor3 = Color3.fromRGB(0, 200, 0)
+cmdBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
 cmdBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 cmdBtn.Text = "أوامر"
 cmdBtn.TextSize = 12
@@ -59,7 +59,7 @@ cmdBtn.BorderSizePixel = 0
 local playerBtn = Instance.new("TextButton", panel)
 playerBtn.Size = UDim2.new(0.5, -5, 0, 35)
 playerBtn.Position = UDim2.new(0.5, 5, 0, 45)
-playerBtn.BackgroundColor3 = Color3.fromRGB(100, 0, 0)
+playerBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
 playerBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 playerBtn.Text = "اللاعب"
 playerBtn.TextSize = 12
@@ -109,6 +109,32 @@ playerRightPanel.Position = UDim2.new(0.35, 0, 0, 0)
 playerRightPanel.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
 playerRightPanel.BorderSizePixel = 0
 
+-- شاشة مشاهدة اللاعب
+local screenFrame = Instance.new("Frame", mainGui)
+screenFrame.Size = UDim2.new(1, 0, 1, 0)
+screenFrame.Position = UDim2.new(0, 0, 0, 0)
+screenFrame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+screenFrame.BorderSizePixel = 0
+screenFrame.Visible = false
+screenFrame.ZIndex = 100
+
+local screenViewport = Instance.new("ViewportFrame", screenFrame)
+screenViewport.Size = UDim2.new(1, 0, 1, 0)
+screenViewport.Position = UDim2.new(0, 0, 0, 0)
+screenViewport.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+screenViewport.BorderSizePixel = 0
+screenViewport.CurrentCamera = workspace.CurrentCamera
+
+local exitScreenBtn = Instance.new("TextButton", screenFrame)
+exitScreenBtn.Size = UDim2.new(0, 100, 0, 40)
+exitScreenBtn.Position = UDim2.new(0.5, -50, 1, -50)
+exitScreenBtn.BackgroundColor3 = Color3.fromRGB(200, 0, 0)
+exitScreenBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+exitScreenBtn.Text = "إنهاء"
+exitScreenBtn.TextSize = 12
+exitScreenBtn.BorderSizePixel = 0
+exitScreenBtn.ZIndex = 101
+
 local function makeBtn(parent, name, y)
     local btn = Instance.new("TextButton", parent)
     btn.Size = UDim2.new(0.9, 0, 0, 35)
@@ -126,7 +152,7 @@ local function makeLabel(parent, text, y)
     lbl.Size = UDim2.new(0.9, 0, 0, 25)
     lbl.Position = UDim2.new(0.05, 0, 0, y)
     lbl.BackgroundTransparency = 1
-    lbl.TextColor3 = Color3.fromRGB(0, 255, 0)
+    lbl.TextColor3 = Color3.fromRGB(147, 51, 234)
     lbl.Text = text
     lbl.TextSize = 11
     lbl.TextXAlignment = Enum.TextXAlignment.Left
@@ -171,7 +197,8 @@ flySpeedBox.Text = "50"
 local searchBox = Instance.new("TextBox", playerLeftPanel)
 searchBox.Size = UDim2.new(0.9, 0, 0, 40)
 searchBox.Position = UDim2.new(0.05, 0, 0, 10)
-searchBox.PlaceholderText = "اسم اللاعب"
+searchBox.PlaceholderText = "اسم الضحية"
+searchBox.PlaceholderColor3 = Color3.fromRGB(150, 150, 150)
 searchBox.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
 searchBox.TextColor3 = Color3.fromRGB(255, 255, 255)
 searchBox.TextSize = 12
@@ -190,28 +217,28 @@ local playerName = Instance.new("TextLabel", playerLeftPanel)
 playerName.Size = UDim2.new(0.9, 0, 0, 25)
 playerName.Position = UDim2.new(0.05, 0, 0.68, 0)
 playerName.BackgroundTransparency = 1
-playerName.TextColor3 = Color3.fromRGB(0, 255, 0)
+playerName.TextColor3 = Color3.fromRGB(147, 51, 234)
 playerName.Text = ""
 playerName.TextSize = 11
 
--- أزرار اللاعب على اليمين
+-- أزرار اللاعب على اليمين (بدون مراقبة)
 local esp_btn = makeBtn(playerRightPanel, "كشف لاعبين", 10)
-local watch_btn = makeBtn(playerRightPanel, "مراقبة", 50)
-local screen_btn = makeBtn(playerRightPanel, "مشاهدة الشاشة", 90)
+local screen_btn = makeBtn(playerRightPanel, "مشاهدة الشاشة", 50)
 
 local end_btn = Instance.new("TextButton", playerRightPanel)
 end_btn.Size = UDim2.new(0.9, 0, 0, 35)
-end_btn.Position = UDim2.new(0.05, 0, 0, 130)
+end_btn.Position = UDim2.new(0.05, 0, 0, 90)
 end_btn.BackgroundColor3 = Color3.fromRGB(200, 0, 0)
 end_btn.TextColor3 = Color3.fromRGB(255, 255, 255)
 end_btn.Text = "إنهاء"
 end_btn.TextSize = 11
 end_btn.BorderSizePixel = 0
 
-local states = {fly = false, noclip = false, esp = false, watch = false, screen = false}
+local states = {fly = false, noclip = false, esp = false, screen = false}
 local cp = nil
 local currentTarget = nil
 local screenLoop = nil
+local originalCam = nil
 
 -- المتغيرات الافتراضية
 local flySpeed = 50
@@ -229,26 +256,26 @@ end
 cmdBtn.MouseButton1Click:Connect(function()
     cmdContent.Visible = true
     playerContent.Visible = false
-    cmdBtn.BackgroundColor3 = Color3.fromRGB(0, 200, 0)
-    playerBtn.BackgroundColor3 = Color3.fromRGB(100, 0, 0)
+    cmdBtn.BackgroundColor3 = Color3.fromRGB(147, 51, 234)
+    playerBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
 end)
 
 playerBtn.MouseButton1Click:Connect(function()
     cmdContent.Visible = false
     playerContent.Visible = true
-    cmdBtn.BackgroundColor3 = Color3.fromRGB(100, 0, 0)
-    playerBtn.BackgroundColor3 = Color3.fromRGB(0, 200, 0)
+    cmdBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+    playerBtn.BackgroundColor3 = Color3.fromRGB(147, 51, 234)
 end)
 
 -- الدائرة تفتح/تغلق اللوحة
 circle.MouseButton1Click:Connect(function()
     panel.Visible = not panel.Visible
-    circle.BackgroundColor3 = panel.Visible and Color3.fromRGB(255, 0, 0) or Color3.fromRGB(0, 255, 0)
+    circle.BackgroundColor3 = panel.Visible and Color3.fromRGB(200, 0, 0) or Color3.fromRGB(147, 51, 234)
 end)
 
 closeBtn.MouseButton1Click:Connect(function()
     panel.Visible = false
-    circle.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
+    circle.BackgroundColor3 = Color3.fromRGB(147, 51, 234)
 end)
 
 -- تحديث قيم السرعة
@@ -291,7 +318,7 @@ end)
 -- طيران
 fly_btn.MouseButton1Click:Connect(function()
     states.fly = not states.fly
-    fly_btn.BackgroundColor3 = states.fly and Color3.fromRGB(0, 200, 0) or Color3.fromRGB(50, 50, 50)
+    fly_btn.BackgroundColor3 = states.fly and Color3.fromRGB(147, 51, 234) or Color3.fromRGB(50, 50, 50)
     
     if states.fly then
         local c = p.Character
@@ -337,7 +364,7 @@ end)
 -- اختراق جدران
 noclip_btn.MouseButton1Click:Connect(function()
     states.noclip = not states.noclip
-    noclip_btn.BackgroundColor3 = states.noclip and Color3.fromRGB(0, 200, 0) or Color3.fromRGB(50, 50, 50)
+    noclip_btn.BackgroundColor3 = states.noclip and Color3.fromRGB(147, 51, 234) or Color3.fromRGB(50, 50, 50)
     
     local c = p.Character
     if c then
@@ -354,7 +381,7 @@ save_btn.MouseButton1Click:Connect(function()
     local c = p.Character
     if c and c:FindFirstChild("HumanoidRootPart") then
         cp = c.HumanoidRootPart.CFrame
-        save_btn.BackgroundColor3 = Color3.fromRGB(0, 200, 0)
+        save_btn.BackgroundColor3 = Color3.fromRGB(147, 51, 234)
     end
 end)
 
@@ -423,7 +450,7 @@ end)
 -- كشف لاعبين
 esp_btn.MouseButton1Click:Connect(function()
     states.esp = not states.esp
-    esp_btn.BackgroundColor3 = states.esp and Color3.fromRGB(0, 200, 0) or Color3.fromRGB(50, 50, 50)
+    esp_btn.BackgroundColor3 = states.esp and Color3.fromRGB(147, 51, 234) or Color3.fromRGB(50, 50, 50)
     
     for _, pl in pairs(game.Players:GetPlayers()) do
         if pl ~= p and pl.Character then
@@ -435,7 +462,7 @@ esp_btn.MouseButton1Click:Connect(function()
                             local newBox = Instance.new("SelectionBox", part)
                             newBox.Name = "EspBox"
                             newBox.Adornee = part
-                            newBox.Color3 = Color3.fromRGB(255, 0, 0)
+                            newBox.Color3 = Color3.fromRGB(147, 51, 234)
                         end
                     else
                         if box then box:Destroy() end
@@ -446,44 +473,24 @@ esp_btn.MouseButton1Click:Connect(function()
     end
 end)
 
--- مراقبة لاعب
-watch_btn.MouseButton1Click:Connect(function()
-    states.watch = not states.watch
-    watch_btn.BackgroundColor3 = states.watch and Color3.fromRGB(0, 200, 0) or Color3.fromRGB(50, 50, 50)
-    
-    if currentTarget and currentTarget.Character then
-        for _, part in pairs(currentTarget.Character:GetDescendants()) do
-            if part:IsA("BasePart") then
-                local box = part:FindFirstChild("WatchBox")
-                if states.watch then
-                    if not box then
-                        local newBox = Instance.new("SelectionBox", part)
-                        newBox.Name = "WatchBox"
-                        newBox.Adornee = part
-                        newBox.Color3 = Color3.fromRGB(255, 0, 0)
-                    end
-                else
-                    if box then box:Destroy() end
-                end
-            end
-        end
-    end
-end)
-
--- مشاهدة الشاشة (من وجهة نظر اللاعب)
+-- مشاهدة الشاشة (نمط لعبة)
 screen_btn.MouseButton1Click:Connect(function()
     if not currentTarget or not currentTarget.Character then return end
     
     states.screen = not states.screen
-    screen_btn.BackgroundColor3 = states.screen and Color3.fromRGB(0, 200, 0) or Color3.fromRGB(50, 50, 50)
+    screen_btn.BackgroundColor3 = states.screen and Color3.fromRGB(147, 51, 234) or Color3.fromRGB(50, 50, 50)
     
     if states.screen then
+        screenFrame.Visible = true
+        panel.Visible = false
         local cam = workspace.CurrentCamera
         local targetRoot = currentTarget.Character:FindFirstChild("HumanoidRootPart")
         local targetHum = currentTarget.Character:FindFirstChild("Humanoid")
         
         if targetRoot and targetHum then
             if screenLoop then screenLoop:Disconnect() end
+            
+            originalCam = cam.CFrame
             
             screenLoop = game:GetService("RunService").RenderStepped:Connect(function()
                 if not states.screen or not currentTarget or not currentTarget.Character then
@@ -493,15 +500,20 @@ screen_btn.MouseButton1Click:Connect(function()
                 
                 targetRoot = currentTarget.Character:FindFirstChild("HumanoidRootPart")
                 if targetRoot then
-                    cam.CFrame = targetRoot.CFrame * CFrame.new(0, 0, 0)
-                    cam.Focus = targetRoot.CFrame * CFrame.new(0, 0, -1)
+                    cam.CFrame = targetRoot.CFrame * CFrame.new(0, 1.5, 0)
+                    cam.Focus = targetRoot.CFrame * CFrame.new(0, 1.5, -10)
                 end
             end)
         end
     else
+        screenFrame.Visible = false
+        panel.Visible = true
         if screenLoop then 
             screenLoop:Disconnect() 
             screenLoop = nil
+        end
+        if originalCam then
+            workspace.CurrentCamera.CFrame = originalCam
         end
     end
 end)
@@ -510,9 +522,28 @@ end)
 end_btn.MouseButton1Click:Connect(function()
     states.screen = false
     screen_btn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+    screenFrame.Visible = false
+    panel.Visible = true
     if screenLoop then 
         screenLoop:Disconnect() 
         screenLoop = nil
+    end
+    if originalCam then
+        workspace.CurrentCamera.CFrame = originalCam
+    end
+end)
+
+exitScreenBtn.MouseButton1Click:Connect(function()
+    states.screen = false
+    screen_btn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+    screenFrame.Visible = false
+    panel.Visible = true
+    if screenLoop then 
+        screenLoop:Disconnect() 
+        screenLoop = nil
+    end
+    if originalCam then
+        workspace.CurrentCamera.CFrame = originalCam
     end
 end)
 
