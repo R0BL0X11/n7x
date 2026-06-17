@@ -109,32 +109,6 @@ playerRightPanel.Position = UDim2.new(0.35, 0, 0, 0)
 playerRightPanel.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
 playerRightPanel.BorderSizePixel = 0
 
--- شاشة مشاهدة اللاعب
-local screenFrame = Instance.new("Frame", mainGui)
-screenFrame.Size = UDim2.new(1, 0, 1, 0)
-screenFrame.Position = UDim2.new(0, 0, 0, 0)
-screenFrame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-screenFrame.BorderSizePixel = 0
-screenFrame.Visible = false
-screenFrame.ZIndex = 100
-
-local screenViewport = Instance.new("ViewportFrame", screenFrame)
-screenViewport.Size = UDim2.new(1, 0, 1, 0)
-screenViewport.Position = UDim2.new(0, 0, 0, 0)
-screenViewport.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-screenViewport.BorderSizePixel = 0
-screenViewport.CurrentCamera = workspace.CurrentCamera
-
-local exitScreenBtn = Instance.new("TextButton", screenFrame)
-exitScreenBtn.Size = UDim2.new(0, 100, 0, 40)
-exitScreenBtn.Position = UDim2.new(0.5, -50, 1, -50)
-exitScreenBtn.BackgroundColor3 = Color3.fromRGB(200, 0, 0)
-exitScreenBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-exitScreenBtn.Text = "إنهاء"
-exitScreenBtn.TextSize = 12
-exitScreenBtn.BorderSizePixel = 0
-exitScreenBtn.ZIndex = 101
-
 local function makeBtn(parent, name, y)
     local btn = Instance.new("TextButton", parent)
     btn.Size = UDim2.new(0.9, 0, 0, 35)
@@ -221,7 +195,7 @@ playerName.TextColor3 = Color3.fromRGB(147, 51, 234)
 playerName.Text = ""
 playerName.TextSize = 11
 
--- أزرار اللاعب على اليمين (بدون مراقبة)
+-- أزرار اللاعب على اليمين
 local esp_btn = makeBtn(playerRightPanel, "كشف لاعبين", 10)
 local screen_btn = makeBtn(playerRightPanel, "مشاهدة الشاشة", 50)
 
@@ -473,7 +447,7 @@ esp_btn.MouseButton1Click:Connect(function()
     end
 end)
 
--- مشاهدة الشاشة (نمط لعبة)
+-- مشاهدة الشاشة (من وجهة نظر اللاعب)
 screen_btn.MouseButton1Click:Connect(function()
     if not currentTarget or not currentTarget.Character then return end
     
@@ -481,7 +455,6 @@ screen_btn.MouseButton1Click:Connect(function()
     screen_btn.BackgroundColor3 = states.screen and Color3.fromRGB(147, 51, 234) or Color3.fromRGB(50, 50, 50)
     
     if states.screen then
-        screenFrame.Visible = true
         panel.Visible = false
         local cam = workspace.CurrentCamera
         local targetRoot = currentTarget.Character:FindFirstChild("HumanoidRootPart")
@@ -489,7 +462,6 @@ screen_btn.MouseButton1Click:Connect(function()
         
         if targetRoot and targetHum then
             if screenLoop then screenLoop:Disconnect() end
-            
             originalCam = cam.CFrame
             
             screenLoop = game:GetService("RunService").RenderStepped:Connect(function()
@@ -499,14 +471,13 @@ screen_btn.MouseButton1Click:Connect(function()
                 end
                 
                 targetRoot = currentTarget.Character:FindFirstChild("HumanoidRootPart")
-                if targetRoot then
-                    cam.CFrame = targetRoot.CFrame * CFrame.new(0, 1.5, 0)
-                    cam.Focus = targetRoot.CFrame * CFrame.new(0, 1.5, -10)
+                if targetRoot and targetHum then
+                    cam.CFrame = targetRoot.CFrame * CFrame.new(0, targetHum.HipHeight, 0)
+                    cam.Focus = targetRoot.CFrame * CFrame.new(0, targetHum.HipHeight, -10)
                 end
             end)
         end
     else
-        screenFrame.Visible = false
         panel.Visible = true
         if screenLoop then 
             screenLoop:Disconnect() 
@@ -522,21 +493,6 @@ end)
 end_btn.MouseButton1Click:Connect(function()
     states.screen = false
     screen_btn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-    screenFrame.Visible = false
-    panel.Visible = true
-    if screenLoop then 
-        screenLoop:Disconnect() 
-        screenLoop = nil
-    end
-    if originalCam then
-        workspace.CurrentCamera.CFrame = originalCam
-    end
-end)
-
-exitScreenBtn.MouseButton1Click:Connect(function()
-    states.screen = false
-    screen_btn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-    screenFrame.Visible = false
     panel.Visible = true
     if screenLoop then 
         screenLoop:Disconnect() 
