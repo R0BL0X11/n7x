@@ -25,6 +25,8 @@ panel.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
 panel.BorderColor3 = Color3.fromRGB(0, 255, 0)
 panel.BorderSizePixel = 2
 panel.Visible = false
+panel.Draggable = true
+panel.Active = true
 
 -- الرأس
 local header = Instance.new("TextLabel", panel)
@@ -70,7 +72,7 @@ searchBox.BorderSizePixel = 0
 
 -- صورة اللاعب
 local playerImage = Instance.new("ImageLabel", rightFrame)
-playerImage.Size = UDim2.new(0.8, 0, 0.7, 0)
+playerImage.Size = UDim2.new(0.8, 0, 0.6, 0)
 playerImage.Position = UDim2.new(0.1, 0, 0.15, 0)
 playerImage.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
 playerImage.BorderSizePixel = 0
@@ -79,15 +81,15 @@ playerImage.Image = ""
 -- اسم اللاعب
 local playerName = Instance.new("TextLabel", rightFrame)
 playerName.Size = UDim2.new(1, 0, 0, 20)
-playerName.Position = UDim2.new(0, 0, 0.85, 0)
+playerName.Position = UDim2.new(0, 0, 0.75, 0)
 playerName.BackgroundTransparency = 1
 playerName.TextColor3 = Color3.fromRGB(0, 255, 0)
 playerName.Text = ""
-playerName.TextSize = 14
+playerName.TextSize = 12
 
 local function makeBtn(name, y)
     local btn = Instance.new("TextButton", leftFrame)
-    btn.Size = UDim2.new(0.9, 0, 0, 35)
+    btn.Size = UDim2.new(0.9, 0, 0, 32)
     btn.Position = UDim2.new(0.05, 0, 0, y)
     btn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
     btn.TextColor3 = Color3.fromRGB(255, 255, 255)
@@ -98,14 +100,17 @@ local function makeBtn(name, y)
 end
 
 local fly_btn = makeBtn("طيران", 10)
-local esp_btn = makeBtn("مراقبة", 50)
-local invis_btn = makeBtn("اختفاء", 90)
-local save_btn = makeBtn("حفظ نقطة", 130)
-local tp_btn = makeBtn("الذهاب للنقطة", 170)
+local esp_btn = makeBtn("كشف لاعبين", 45)
+local invis_btn = makeBtn("اختفاء", 80)
+local save_btn = makeBtn("حفظ نقطة", 115)
+local tp_btn = makeBtn("الذهاب للنقطة", 150)
+local del_cp_btn = makeBtn("حذف النقطة", 185)
+local tp_player_btn = makeBtn("ذهاب للاعب", 220)
+local watch_btn = makeBtn("مراقبة", 255)
 
-local states = {fly = false, esp = false, invis = false, menu = false}
+local states = {fly = false, esp = false, invis = false, menu = false, watch = false}
 local cp = nil
-local espTargets = {}
+local currentTarget = nil
 
 -- الدائرة تفتح/تغلق اللوحة
 circle.MouseButton1Click:Connect(function()
@@ -187,13 +192,68 @@ fly_btn.MouseButton1Click:Connect(function()
     end
 end)
 
--- مراقبة مع صورة
+-- كشف لاعبين
+esp_btn.MouseButton1Click:Connect(function()
+    states.esp = not states.esp
+    esp_btn.BackgroundColor3 = states.esp and Color3.fromRGB(0, 200, 0) or Color3.fromRGB(50, 50, 50)
+    
+    for _, pl in pairs(game.Players:GetPlayers()) do
+        if pl ~= p and pl.Character then
+            for _, part in pairs(pl.Character:GetDescendants()) do
+                if part:IsA("BasePart") then
+                    local box = part:FindFirstChild("EspBox")
+                    if states.esp then
+                        if not box then
+                            local newBox = Instance.new("SelectionBox", part)
+                            newBox.Name = "EspBox"
+                            newBox.Adornee = part
+                            newBox.Color3 = Color3.fromRGB(255, 0, 0)
+                        end
+                    else
+                        if box then box:Destroy() end
+                    end
+                end
+            end
+        end
+    end
+end)
+
+-- حفظ نقطة
+save_btn.MouseButton1Click:Connect(function()
+    local c = p.Character
+    if c and c:FindFirstChild("HumanoidRootPart") then
+        cp = c.HumanoidRootPart.CFrame
+        save_btn.BackgroundColor3 = Color3.fromRGB(0, 200, 0)
+        del_cp_btn.Visible = true
+    end
+end)
+
+-- الذهاب للنقطة
+tp_btn.MouseButton1Click:Connect(function()
+    if cp then
+        local c = p.Character
+        if c and c:FindFirstChild("HumanoidRootPart") then
+            c.HumanoidRootPart.CFrame = cp
+        end
+    end
+end)
+
+-- حذف النقطة
+del_cp_btn.MouseButton1Click:Connect(function()
+    cp = nil
+    save_btn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+    del_cp_btn.Visible = false
+end)
+
+-- البحث عن لاعب
 searchBox:GetPropertyChangedSignal("Text"):Connect(function()
     local text = searchBox.Text:lower()
     if text:len() == 0 then
         playerImage.Image = ""
         playerName.Text = ""
-        esp_btn.Visible = false
+        tp_player_btn.Visible = false
+        watch_btn.Visible = false
+        currentTarget = nil
         return
     end
     
@@ -206,59 +266,59 @@ searchBox:GetPropertyChangedSignal("Text"):Connect(function()
     
     if #matches == 1 then
         local target = matches[1]
-        playerImage.Image = game:GetService("Players"):GetUserThumbnailAsync(target.UserId, Enum.ThumbnailType.HeadShot, Enum.ThumbnailSize.Size420x420)
-        playerName.Text = target.Name
-        esp_btn.Visible = true
-        
-        esp_btn.MouseButton1Click:Connect(function()
-            states.esp = not states.esp
-            esp_btn.BackgroundColor3 = states.esp and Color3.fromRGB(0, 200, 0) or Color3.fromRGB(50, 50, 50)
-            
-            if target.Character then
-                local root = target.Character:FindFirstChild("HumanoidRootPart")
-                if root then
-                    local old = root:FindFirstChild("EspBox")
-                    if old then old:Destroy() end
-                    
-                    if states.esp then
-                        for _, part in pairs(target.Character:GetDescendants()) do
-                            if part:IsA("BasePart") then
-                                local box = Instance.new("SelectionBox", part)
-                                box.Name = "EspBox"
-                                box.Adornee = part
-                                box.Color3 = Color3.fromRGB(255, 0, 0)
-                            end
-                        end
-                    end
-                end
-            end
+        currentTarget = target
+        pcall(function()
+            playerImage.Image = game:GetService("Players"):GetUserThumbnailAsync(target.UserId, Enum.ThumbnailType.HeadShot, Enum.ThumbnailSize.Size420x420)
         end)
+        playerName.Text = target.Name
+        tp_player_btn.Visible = true
+        watch_btn.Visible = true
     elseif #matches > 1 then
         playerImage.Image = ""
         playerName.Text = "متعدد - اكتب أكثر"
-        esp_btn.Visible = false
+        tp_player_btn.Visible = false
+        watch_btn.Visible = false
+        currentTarget = nil
     else
         playerImage.Image = ""
         playerName.Text = "لم يتم العثور"
-        esp_btn.Visible = false
+        tp_player_btn.Visible = false
+        watch_btn.Visible = false
+        currentTarget = nil
     end
 end)
 
--- حفظ نقطة
-save_btn.MouseButton1Click:Connect(function()
-    local c = p.Character
-    if c and c:FindFirstChild("HumanoidRootPart") then
-        cp = c.HumanoidRootPart.CFrame
-        save_btn.BackgroundColor3 = Color3.fromRGB(0, 200, 0)
+-- ذهاب للاعب
+tp_player_btn.MouseButton1Click:Connect(function()
+    if currentTarget and currentTarget.Character then
+        local targetRoot = currentTarget.Character:FindFirstChild("HumanoidRootPart")
+        local myRoot = p.Character:FindFirstChild("HumanoidRootPart")
+        if targetRoot and myRoot then
+            myRoot.CFrame = targetRoot.CFrame + Vector3.new(5, 0, 0)
+        end
     end
 end)
 
--- الذهاب للنقطة
-tp_btn.MouseButton1Click:Connect(function()
-    if cp then
-        local c = p.Character
-        if c and c:FindFirstChild("HumanoidRootPart") then
-            c.HumanoidRootPart.CFrame = cp
+-- مراقبة لاعب
+watch_btn.MouseButton1Click:Connect(function()
+    states.watch = not states.watch
+    watch_btn.BackgroundColor3 = states.watch and Color3.fromRGB(0, 200, 0) or Color3.fromRGB(50, 50, 50)
+    
+    if currentTarget and currentTarget.Character then
+        for _, part in pairs(currentTarget.Character:GetDescendants()) do
+            if part:IsA("BasePart") then
+                local box = part:FindFirstChild("WatchBox")
+                if states.watch then
+                    if not box then
+                        local newBox = Instance.new("SelectionBox", part)
+                        newBox.Name = "WatchBox"
+                        newBox.Adornee = part
+                        newBox.Color3 = Color3.fromRGB(255, 0, 0)
+                    end
+                else
+                    if box then box:Destroy() end
+                end
+            end
         end
     end
 end)
