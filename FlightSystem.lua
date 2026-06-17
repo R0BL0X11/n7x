@@ -191,7 +191,7 @@ local playerName = Instance.new("TextLabel", playerLeftPanel)
 playerName.Size = UDim2.new(0.9, 0, 0, 25)
 playerName.Position = UDim2.new(0.05, 0, 0.68, 0)
 playerName.BackgroundTransparency = 1
-playerName.TextColor3 = Color3.fromRGB(147, 51, 234)
+playerName.TextColor3 = Color3.fromRGB(255, 255, 255)
 playerName.Text = ""
 playerName.TextSize = 11
 
