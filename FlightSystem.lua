@@ -19,8 +19,8 @@ circle.Active = true
 
 -- اللوحة الرئيسية
 local panel = Instance.new("Frame", mainGui)
-panel.Size = UDim2.new(0, 500, 0, 300)
-panel.Position = UDim2.new(0.5, -250, 0.5, -150)
+panel.Size = UDim2.new(0, 400, 0, 350)
+panel.Position = UDim2.new(0.5, -200, 0.5, -175)
 panel.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
 panel.BorderColor3 = Color3.fromRGB(0, 255, 0)
 panel.BorderSizePixel = 2
@@ -33,7 +33,7 @@ local header = Instance.new("TextLabel", panel)
 header.Size = UDim2.new(1, 0, 0, 40)
 header.BackgroundColor3 = Color3.fromRGB(0, 150, 0)
 header.TextColor3 = Color3.fromRGB(255, 255, 255)
-header.Text = "N7x Menu"
+header.Text = "N7x"
 header.TextSize = 16
 header.BorderSizePixel = 0
 
@@ -46,49 +46,43 @@ closeBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 closeBtn.Text = "X"
 closeBtn.BorderSizePixel = 0
 
--- الجزء الأيسر (الأزرار)
-local leftFrame = Instance.new("Frame", panel)
-leftFrame.Size = UDim2.new(0, 200, 1, -40)
-leftFrame.Position = UDim2.new(0, 0, 0, 40)
-leftFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-leftFrame.BorderSizePixel = 0
+-- الخانتين العلويات
+local cmdBtn = Instance.new("TextButton", panel)
+cmdBtn.Size = UDim2.new(0.5, -5, 0, 35)
+cmdBtn.Position = UDim2.new(0, 5, 0, 45)
+cmdBtn.BackgroundColor3 = Color3.fromRGB(0, 200, 0)
+cmdBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+cmdBtn.Text = "أوامر"
+cmdBtn.TextSize = 12
+cmdBtn.BorderSizePixel = 0
 
--- الجزء الأيمن (البحث والصورة)
-local rightFrame = Instance.new("Frame", panel)
-rightFrame.Size = UDim2.new(0, 300, 1, -40)
-rightFrame.Position = UDim2.new(0, 200, 0, 40)
-rightFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
-rightFrame.BorderSizePixel = 0
+local playerBtn = Instance.new("TextButton", panel)
+playerBtn.Size = UDim2.new(0.5, -5, 0, 35)
+playerBtn.Position = UDim2.new(0.5, 5, 0, 45)
+playerBtn.BackgroundColor3 = Color3.fromRGB(100, 0, 0)
+playerBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+playerBtn.Text = "اللاعب"
+playerBtn.TextSize = 12
+playerBtn.BorderSizePixel = 0
 
--- حقل البحث
-local searchBox = Instance.new("TextBox", rightFrame)
-searchBox.Size = UDim2.new(0.9, 0, 0, 40)
-searchBox.Position = UDim2.new(0.05, 0, 0, 10)
-searchBox.PlaceholderText = "اكتب اسم اللاعب"
-searchBox.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-searchBox.TextColor3 = Color3.fromRGB(255, 255, 255)
-searchBox.TextSize = 12
-searchBox.BorderSizePixel = 0
+-- محتوى الأوامر
+local cmdContent = Instance.new("Frame", panel)
+cmdContent.Size = UDim2.new(1, 0, 1, -80)
+cmdContent.Position = UDim2.new(0, 0, 0, 85)
+cmdContent.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+cmdContent.BorderSizePixel = 0
+cmdContent.Visible = true
 
--- صورة اللاعب
-local playerImage = Instance.new("ImageLabel", rightFrame)
-playerImage.Size = UDim2.new(0.8, 0, 0.6, 0)
-playerImage.Position = UDim2.new(0.1, 0, 0.15, 0)
-playerImage.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-playerImage.BorderSizePixel = 0
-playerImage.Image = ""
+-- محتوى اللاعب
+local playerContent = Instance.new("Frame", panel)
+playerContent.Size = UDim2.new(1, 0, 1, -80)
+playerContent.Position = UDim2.new(0, 0, 0, 85)
+playerContent.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+playerContent.BorderSizePixel = 0
+playerContent.Visible = false
 
--- اسم اللاعب
-local playerName = Instance.new("TextLabel", rightFrame)
-playerName.Size = UDim2.new(1, 0, 0, 20)
-playerName.Position = UDim2.new(0, 0, 0.75, 0)
-playerName.BackgroundTransparency = 1
-playerName.TextColor3 = Color3.fromRGB(0, 255, 0)
-playerName.Text = ""
-playerName.TextSize = 12
-
-local function makeBtn(name, y)
-    local btn = Instance.new("TextButton", leftFrame)
+local function makeBtn(parent, name, y)
+    local btn = Instance.new("TextButton", parent)
     btn.Size = UDim2.new(0.9, 0, 0, 32)
     btn.Position = UDim2.new(0.05, 0, 0, y)
     btn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
@@ -99,51 +93,91 @@ local function makeBtn(name, y)
     return btn
 end
 
-local fly_btn = makeBtn("طيران", 10)
-local esp_btn = makeBtn("كشف لاعبين", 45)
-local invis_btn = makeBtn("اختفاء", 80)
-local save_btn = makeBtn("حفظ نقطة", 115)
-local tp_btn = makeBtn("الذهاب للنقطة", 150)
-local del_cp_btn = makeBtn("حذف النقطة", 185)
-local tp_player_btn = makeBtn("ذهاب للاعب", 220)
-local watch_btn = makeBtn("مراقبة", 255)
+-- أزرار الأوامر
+local fly_btn = makeBtn(cmdContent, "طيران", 10)
+local noclip_btn = makeBtn(cmdContent, "اختراق جدران", 45)
+local save_btn = makeBtn(cmdContent, "حفظ نقطة", 80)
+local tp_btn = makeBtn(cmdContent, "الذهاب للنقطة", 115)
+local del_cp_btn = makeBtn(cmdContent, "حذف النقطة", 150)
 
-local states = {fly = false, esp = false, invis = false, menu = false, watch = false}
+-- حقل البحث في قسم اللاعب
+local searchBox = Instance.new("TextBox", playerContent)
+searchBox.Size = UDim2.new(0.9, 0, 0, 35)
+searchBox.Position = UDim2.new(0.05, 0, 0, 10)
+searchBox.PlaceholderText = "اكتب اسم اللاعب"
+searchBox.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+searchBox.TextColor3 = Color3.fromRGB(255, 255, 255)
+searchBox.TextSize = 12
+searchBox.BorderSizePixel = 0
+
+-- صورة اللاعب
+local playerImage = Instance.new("ImageLabel", playerContent)
+playerImage.Size = UDim2.new(0.4, 0, 0.5, 0)
+playerImage.Position = UDim2.new(0.05, 0, 0.5, 0)
+playerImage.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+playerImage.BorderSizePixel = 0
+playerImage.Image = ""
+
+-- اسم اللاعب
+local playerName = Instance.new("TextLabel", playerContent)
+playerName.Size = UDim2.new(0.4, 0, 0, 20)
+playerName.Position = UDim2.new(0.05, 0, 1, -25)
+playerName.BackgroundTransparency = 1
+playerName.TextColor3 = Color3.fromRGB(0, 255, 0)
+playerName.Text = ""
+playerName.TextSize = 12
+
+-- أزرار اللاعب
+local esp_btn = makeBtn(playerContent, "كشف لاعب", 10)
+esp_btn.Position = UDim2.new(0.5, 0, 0, 10)
+esp_btn.Size = UDim2.new(0.45, 0, 0, 32)
+
+local watch_btn = makeBtn(playerContent, "مراقبة", 45)
+watch_btn.Position = UDim2.new(0.5, 0, 0, 45)
+watch_btn.Size = UDim2.new(0.45, 0, 0, 32)
+
+local screen_btn = makeBtn(playerContent, "مشاهدة الشاشة", 80)
+screen_btn.Position = UDim2.new(0.5, 0, 0, 80)
+screen_btn.Size = UDim2.new(0.45, 0, 0, 32)
+
+local end_btn = Instance.new("TextButton", playerContent)
+end_btn.Size = UDim2.new(0.45, 0, 0, 32)
+end_btn.Position = UDim2.new(0.5, 0, 0, 115)
+end_btn.BackgroundColor3 = Color3.fromRGB(200, 0, 0)
+end_btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+end_btn.Text = "إنهاء"
+end_btn.TextSize = 11
+end_btn.BorderSizePixel = 0
+
+local states = {fly = false, noclip = false, esp = false, watch = false}
 local cp = nil
 local currentTarget = nil
+local screenActive = false
+
+-- تبديل الأقسام
+cmdBtn.MouseButton1Click:Connect(function()
+    cmdContent.Visible = true
+    playerContent.Visible = false
+    cmdBtn.BackgroundColor3 = Color3.fromRGB(0, 200, 0)
+    playerBtn.BackgroundColor3 = Color3.fromRGB(100, 0, 0)
+end)
+
+playerBtn.MouseButton1Click:Connect(function()
+    cmdContent.Visible = false
+    playerContent.Visible = true
+    cmdBtn.BackgroundColor3 = Color3.fromRGB(100, 0, 0)
+    playerBtn.BackgroundColor3 = Color3.fromRGB(0, 200, 0)
+end)
 
 -- الدائرة تفتح/تغلق اللوحة
 circle.MouseButton1Click:Connect(function()
-    states.menu = not states.menu
-    panel.Visible = states.menu
-    circle.BackgroundColor3 = states.menu and Color3.fromRGB(255, 0, 0) or Color3.fromRGB(0, 255, 0)
+    panel.Visible = not panel.Visible
+    circle.BackgroundColor3 = panel.Visible and Color3.fromRGB(255, 0, 0) or Color3.fromRGB(0, 255, 0)
 end)
 
 closeBtn.MouseButton1Click:Connect(function()
-    states.menu = false
     panel.Visible = false
     circle.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
-end)
-
--- الاختفاء الحقيقي
-invis_btn.MouseButton1Click:Connect(function()
-    states.invis = not states.invis
-    invis_btn.BackgroundColor3 = states.invis and Color3.fromRGB(0, 200, 0) or Color3.fromRGB(50, 50, 50)
-    
-    local c = p.Character
-    if c then
-        for _, v in pairs(c:GetDescendants()) do
-            if v:IsA("BasePart") then
-                if states.invis then
-                    v.CanCollide = false
-                    v.Transparency = 1
-                else
-                    v.Transparency = 0
-                    if v.Name ~= "HumanoidRootPart" then v.CanCollide = true end
-                end
-            end
-        end
-    end
 end)
 
 -- طيران
@@ -192,7 +226,82 @@ fly_btn.MouseButton1Click:Connect(function()
     end
 end)
 
--- كشف لاعبين
+-- اختراق جدران
+noclip_btn.MouseButton1Click:Connect(function()
+    states.noclip = not states.noclip
+    noclip_btn.BackgroundColor3 = states.noclip and Color3.fromRGB(0, 200, 0) or Color3.fromRGB(50, 50, 50)
+    
+    local c = p.Character
+    if c then
+        for _, v in pairs(c:GetDescendants()) do
+            if v:IsA("BasePart") then
+                v.CanCollide = not states.noclip
+            end
+        end
+    end
+end)
+
+-- حفظ نقطة
+save_btn.MouseButton1Click:Connect(function()
+    local c = p.Character
+    if c and c:FindFirstChild("HumanoidRootPart") then
+        cp = c.HumanoidRootPart.CFrame
+        save_btn.BackgroundColor3 = Color3.fromRGB(0, 200, 0)
+    end
+end)
+
+-- الذهاب للنقطة
+tp_btn.MouseButton1Click:Connect(function()
+    if cp then
+        local c = p.Character
+        if c and c:FindFirstChild("HumanoidRootPart") then
+            c.HumanoidRootPart.CFrame = cp
+        end
+    end
+end)
+
+-- حذف النقطة
+del_cp_btn.MouseButton1Click:Connect(function()
+    cp = nil
+    save_btn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+end)
+
+-- البحث عن لاعب
+searchBox:GetPropertyChangedSignal("Text"):Connect(function()
+    local text = searchBox.Text:lower()
+    if text:len() == 0 then
+        playerImage.Image = ""
+        playerName.Text = ""
+        currentTarget = nil
+        return
+    end
+    
+    local matches = {}
+    for _, pl in pairs(game.Players:GetPlayers()) do
+        if pl ~= p and pl.Name:lower():sub(1, text:len()) == text then
+            table.insert(matches, pl)
+        end
+    end
+    
+    if #matches == 1 then
+        local target = matches[1]
+        currentTarget = target
+        pcall(function()
+            playerImage.Image = game:GetService("Players"):GetUserThumbnailAsync(target.UserId, Enum.ThumbnailType.HeadShot, Enum.ThumbnailSize.Size420x420)
+        end)
+        playerName.Text = target.Name
+    elseif #matches > 1 then
+        playerImage.Image = ""
+        playerName.Text = "متعدد - اكتب أكثر"
+        currentTarget = nil
+    else
+        playerImage.Image = ""
+        playerName.Text = "لم يتم العثور"
+        currentTarget = nil
+    end
+end)
+
+-- كشف لاعب
 esp_btn.MouseButton1Click:Connect(function()
     states.esp = not states.esp
     esp_btn.BackgroundColor3 = states.esp and Color3.fromRGB(0, 200, 0) or Color3.fromRGB(50, 50, 50)
@@ -214,87 +323,6 @@ esp_btn.MouseButton1Click:Connect(function()
                     end
                 end
             end
-        end
-    end
-end)
-
--- حفظ نقطة
-save_btn.MouseButton1Click:Connect(function()
-    local c = p.Character
-    if c and c:FindFirstChild("HumanoidRootPart") then
-        cp = c.HumanoidRootPart.CFrame
-        save_btn.BackgroundColor3 = Color3.fromRGB(0, 200, 0)
-        del_cp_btn.Visible = true
-    end
-end)
-
--- الذهاب للنقطة
-tp_btn.MouseButton1Click:Connect(function()
-    if cp then
-        local c = p.Character
-        if c and c:FindFirstChild("HumanoidRootPart") then
-            c.HumanoidRootPart.CFrame = cp
-        end
-    end
-end)
-
--- حذف النقطة
-del_cp_btn.MouseButton1Click:Connect(function()
-    cp = nil
-    save_btn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-    del_cp_btn.Visible = false
-end)
-
--- البحث عن لاعب
-searchBox:GetPropertyChangedSignal("Text"):Connect(function()
-    local text = searchBox.Text:lower()
-    if text:len() == 0 then
-        playerImage.Image = ""
-        playerName.Text = ""
-        tp_player_btn.Visible = false
-        watch_btn.Visible = false
-        currentTarget = nil
-        return
-    end
-    
-    local matches = {}
-    for _, pl in pairs(game.Players:GetPlayers()) do
-        if pl ~= p and pl.Name:lower():sub(1, text:len()) == text then
-            table.insert(matches, pl)
-        end
-    end
-    
-    if #matches == 1 then
-        local target = matches[1]
-        currentTarget = target
-        pcall(function()
-            playerImage.Image = game:GetService("Players"):GetUserThumbnailAsync(target.UserId, Enum.ThumbnailType.HeadShot, Enum.ThumbnailSize.Size420x420)
-        end)
-        playerName.Text = target.Name
-        tp_player_btn.Visible = true
-        watch_btn.Visible = true
-    elseif #matches > 1 then
-        playerImage.Image = ""
-        playerName.Text = "متعدد - اكتب أكثر"
-        tp_player_btn.Visible = false
-        watch_btn.Visible = false
-        currentTarget = nil
-    else
-        playerImage.Image = ""
-        playerName.Text = "لم يتم العثور"
-        tp_player_btn.Visible = false
-        watch_btn.Visible = false
-        currentTarget = nil
-    end
-end)
-
--- ذهاب للاعب
-tp_player_btn.MouseButton1Click:Connect(function()
-    if currentTarget and currentTarget.Character then
-        local targetRoot = currentTarget.Character:FindFirstChild("HumanoidRootPart")
-        local myRoot = p.Character:FindFirstChild("HumanoidRootPart")
-        if targetRoot and myRoot then
-            myRoot.CFrame = targetRoot.CFrame + Vector3.new(5, 0, 0)
         end
     end
 end)
@@ -321,6 +349,32 @@ watch_btn.MouseButton1Click:Connect(function()
             end
         end
     end
+end)
+
+-- مشاهدة الشاشة
+screen_btn.MouseButton1Click:Connect(function()
+    if currentTarget and currentTarget.Character then
+        screenActive = true
+        local cam = workspace.CurrentCamera
+        local targetRoot = currentTarget.Character:FindFirstChild("HumanoidRootPart")
+        if targetRoot then
+            cam.CFrame = targetRoot.CFrame + targetRoot.CFrame.LookVector * 5
+            
+            local loop
+            loop = game:GetService("RunService").RenderStepped:Connect(function()
+                if not screenActive or not currentTarget or not currentTarget.Character then
+                    loop:Disconnect()
+                    return
+                end
+                cam.CFrame = targetRoot.CFrame + targetRoot.CFrame.LookVector * 5
+            end)
+        end
+    end
+end)
+
+-- إنهاء مشاهدة الشاشة
+end_btn.MouseButton1Click:Connect(function()
+    screenActive = false
 end)
 
 print("N7x تم تحميله!")
