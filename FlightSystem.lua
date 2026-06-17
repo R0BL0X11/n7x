@@ -19,8 +19,8 @@ circle.Active = true
 
 -- اللوحة الرئيسية
 local panel = Instance.new("Frame", mainGui)
-panel.Size = UDim2.new(0, 400, 0, 350)
-panel.Position = UDim2.new(0.5, -200, 0.5, -175)
+panel.Size = UDim2.new(0, 900, 0, 550)
+panel.Position = UDim2.new(0.5, -450, 0.5, -275)
 panel.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
 panel.BorderColor3 = Color3.fromRGB(0, 255, 0)
 panel.BorderSizePixel = 2
@@ -67,23 +67,51 @@ playerBtn.BorderSizePixel = 0
 
 -- محتوى الأوامر
 local cmdContent = Instance.new("Frame", panel)
-cmdContent.Size = UDim2.new(1, 0, 1, -80)
+cmdContent.Size = UDim2.new(1, 0, 1, -85)
 cmdContent.Position = UDim2.new(0, 0, 0, 85)
 cmdContent.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
 cmdContent.BorderSizePixel = 0
 cmdContent.Visible = true
 
+-- اليسار (الأزرار)
+local leftPanel = Instance.new("Frame", cmdContent)
+leftPanel.Size = UDim2.new(0.35, 0, 1, 0)
+leftPanel.Position = UDim2.new(0, 0, 0, 0)
+leftPanel.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+leftPanel.BorderSizePixel = 0
+
+-- اليمين (الإعدادات)
+local rightPanel = Instance.new("Frame", cmdContent)
+rightPanel.Size = UDim2.new(0.65, 0, 1, 0)
+rightPanel.Position = UDim2.new(0.35, 0, 0, 0)
+rightPanel.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+rightPanel.BorderSizePixel = 0
+
 -- محتوى اللاعب
 local playerContent = Instance.new("Frame", panel)
-playerContent.Size = UDim2.new(1, 0, 1, -80)
+playerContent.Size = UDim2.new(1, 0, 1, -85)
 playerContent.Position = UDim2.new(0, 0, 0, 85)
 playerContent.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
 playerContent.BorderSizePixel = 0
 playerContent.Visible = false
 
+-- اليسار في قسم اللاعب (البحث والصورة)
+local playerLeftPanel = Instance.new("Frame", playerContent)
+playerLeftPanel.Size = UDim2.new(0.35, 0, 1, 0)
+playerLeftPanel.Position = UDim2.new(0, 0, 0, 0)
+playerLeftPanel.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+playerLeftPanel.BorderSizePixel = 0
+
+-- اليمين في قسم اللاعب (الأزرار)
+local playerRightPanel = Instance.new("Frame", playerContent)
+playerRightPanel.Size = UDim2.new(0.65, 0, 1, 0)
+playerRightPanel.Position = UDim2.new(0.35, 0, 0, 0)
+playerRightPanel.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+playerRightPanel.BorderSizePixel = 0
+
 local function makeBtn(parent, name, y)
     local btn = Instance.new("TextButton", parent)
-    btn.Size = UDim2.new(0.9, 0, 0, 32)
+    btn.Size = UDim2.new(0.9, 0, 0, 35)
     btn.Position = UDim2.new(0.05, 0, 0, y)
     btn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
     btn.TextColor3 = Color3.fromRGB(255, 255, 255)
@@ -93,56 +121,83 @@ local function makeBtn(parent, name, y)
     return btn
 end
 
--- أزرار الأوامر
-local fly_btn = makeBtn(cmdContent, "طيران", 10)
-local noclip_btn = makeBtn(cmdContent, "اختراق جدران", 45)
-local save_btn = makeBtn(cmdContent, "حفظ نقطة", 80)
-local tp_btn = makeBtn(cmdContent, "الذهاب للنقطة", 115)
-local del_cp_btn = makeBtn(cmdContent, "حذف النقطة", 150)
+local function makeLabel(parent, text, y)
+    local lbl = Instance.new("TextLabel", parent)
+    lbl.Size = UDim2.new(0.9, 0, 0, 25)
+    lbl.Position = UDim2.new(0.05, 0, 0, y)
+    lbl.BackgroundTransparency = 1
+    lbl.TextColor3 = Color3.fromRGB(0, 255, 0)
+    lbl.Text = text
+    lbl.TextSize = 11
+    lbl.TextXAlignment = Enum.TextXAlignment.Left
+    return lbl
+end
+
+local function makeInputBox(parent, placeholder, y)
+    local box = Instance.new("TextBox", parent)
+    box.Size = UDim2.new(0.9, 0, 0, 35)
+    box.Position = UDim2.new(0.05, 0, 0, y)
+    box.PlaceholderText = placeholder
+    box.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+    box.TextColor3 = Color3.fromRGB(255, 255, 255)
+    box.TextSize = 11
+    box.BorderSizePixel = 0
+    return box
+end
+
+-- أزرار الأوامر على اليسار
+local fly_btn = makeBtn(leftPanel, "طيران", 10)
+local noclip_btn = makeBtn(leftPanel, "اختراق جدران", 50)
+local save_btn = makeBtn(leftPanel, "حفظ نقطة", 90)
+local tp_btn = makeBtn(leftPanel, "الذهاب للنقطة", 130)
+local del_cp_btn = makeBtn(leftPanel, "حذف النقطة", 170)
+local tp_player_btn = makeBtn(leftPanel, "انتقال للاعب", 210)
+
+-- الإعدادات على اليمين
+makeLabel(rightPanel, "السرعة", 10)
+local speedBox = makeInputBox(rightPanel, "مثال: 50", 35)
+
+makeLabel(rightPanel, "قوة النط", 75)
+local jumpBox = makeInputBox(rightPanel, "مثال: 100", 100)
+
+makeLabel(rightPanel, "سرعة الطيران", 140)
+local flySpeedBox = makeInputBox(rightPanel, "مثال: 50", 165)
 
 -- حقل البحث في قسم اللاعب
-local searchBox = Instance.new("TextBox", playerContent)
-searchBox.Size = UDim2.new(0.9, 0, 0, 35)
+local searchBox = Instance.new("TextBox", playerLeftPanel)
+searchBox.Size = UDim2.new(0.9, 0, 0, 40)
 searchBox.Position = UDim2.new(0.05, 0, 0, 10)
-searchBox.PlaceholderText = "اكتب اسم اللاعب"
+searchBox.PlaceholderText = "اسم اللاعب"
 searchBox.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
 searchBox.TextColor3 = Color3.fromRGB(255, 255, 255)
 searchBox.TextSize = 12
 searchBox.BorderSizePixel = 0
 
 -- صورة اللاعب
-local playerImage = Instance.new("ImageLabel", playerContent)
-playerImage.Size = UDim2.new(0.4, 0, 0.5, 0)
-playerImage.Position = UDim2.new(0.05, 0, 0.5, 0)
+local playerImage = Instance.new("ImageLabel", playerLeftPanel)
+playerImage.Size = UDim2.new(0.9, 0, 0.5, 0)
+playerImage.Position = UDim2.new(0.05, 0, 0.12, 0)
 playerImage.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
 playerImage.BorderSizePixel = 0
 playerImage.Image = ""
 
 -- اسم اللاعب
-local playerName = Instance.new("TextLabel", playerContent)
-playerName.Size = UDim2.new(0.4, 0, 0, 20)
-playerName.Position = UDim2.new(0.05, 0, 1, -25)
+local playerName = Instance.new("TextLabel", playerLeftPanel)
+playerName.Size = UDim2.new(0.9, 0, 0, 25)
+playerName.Position = UDim2.new(0.05, 0, 0.68, 0)
 playerName.BackgroundTransparency = 1
 playerName.TextColor3 = Color3.fromRGB(0, 255, 0)
 playerName.Text = ""
-playerName.TextSize = 12
+playerName.TextSize = 11
 
--- أزرار اللاعب
-local esp_btn = makeBtn(playerContent, "كشف لاعب", 10)
-esp_btn.Position = UDim2.new(0.5, 0, 0, 10)
-esp_btn.Size = UDim2.new(0.45, 0, 0, 32)
+-- أزرار اللاعب على اليمين
+local esp_btn = makeBtn(playerRightPanel, "كشف لاعبين", 10)
+local watch_btn = makeBtn(playerRightPanel, "مراقبة", 50)
+local screen_btn = makeBtn(playerRightPanel, "مشاهدة الشاشة", 90)
 
-local watch_btn = makeBtn(playerContent, "مراقبة", 45)
-watch_btn.Position = UDim2.new(0.5, 0, 0, 45)
-watch_btn.Size = UDim2.new(0.45, 0, 0, 32)
-
-local screen_btn = makeBtn(playerContent, "مشاهدة الشاشة", 80)
-screen_btn.Position = UDim2.new(0.5, 0, 0, 80)
-screen_btn.Size = UDim2.new(0.45, 0, 0, 32)
-
-local end_btn = Instance.new("TextButton", playerContent)
-end_btn.Size = UDim2.new(0.45, 0, 0, 32)
-end_btn.Position = UDim2.new(0.5, 0, 0, 115)
+local end_btn = Instance.new("TextButton", playerRightPanel)
+end_btn.Size = UDim2.new(0.9, 0, 0, 35)
+end_btn.Position = UDim2.new(0.05, 0, 0, 130)
 end_btn.BackgroundColor3 = Color3.fromRGB(200, 0, 0)
 end_btn.TextColor3 = Color3.fromRGB(255, 255, 255)
 end_btn.Text = "إنهاء"
@@ -153,6 +208,11 @@ local states = {fly = false, noclip = false, esp = false, watch = false}
 local cp = nil
 local currentTarget = nil
 local screenActive = false
+
+-- المتغيرات الافتراضية
+local flySpeed = 50
+local jumpPower = 100
+local speed = 50
 
 -- تبديل الأقسام
 cmdBtn.MouseButton1Click:Connect(function()
@@ -180,6 +240,22 @@ closeBtn.MouseButton1Click:Connect(function()
     circle.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
 end)
 
+-- تحديث قيم السرعة
+speedBox:GetPropertyChangedSignal("Text"):Connect(function()
+    local val = tonumber(speedBox.Text)
+    if val then speed = val end
+end)
+
+jumpBox:GetPropertyChangedSignal("Text"):Connect(function()
+    local val = tonumber(jumpBox.Text)
+    if val then jumpPower = val end
+end)
+
+flySpeedBox:GetPropertyChangedSignal("Text"):Connect(function()
+    local val = tonumber(flySpeedBox.Text)
+    if val then flySpeed = val end
+end)
+
 -- طيران
 fly_btn.MouseButton1Click:Connect(function()
     states.fly = not states.fly
@@ -197,7 +273,7 @@ fly_btn.MouseButton1Click:Connect(function()
         local bg = Instance.new("BodyGyro", r)
         bg.MaxTorque = Vector3.new(9e9, 9e9, 9e9)
         
-        hu.JumpPower = 100
+        hu.JumpPower = jumpPower
         
         local loop
         loop = game:GetService("RunService").RenderStepped:Connect(function()
@@ -220,7 +296,7 @@ fly_btn.MouseButton1Click:Connect(function()
             if ui:IsKeyDown(Enum.KeyCode.Space) then move = move + Vector3.new(0, 1, 0) end
             
             if move.Magnitude > 0 then move = move.Unit end
-            bv.Velocity = move * 50
+            bv.Velocity = move * flySpeed
             bg.CFrame = cam.CFrame
         end)
     end
@@ -266,6 +342,17 @@ del_cp_btn.MouseButton1Click:Connect(function()
     save_btn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
 end)
 
+-- انتقال للاعب
+tp_player_btn.MouseButton1Click:Connect(function()
+    if currentTarget and currentTarget.Character then
+        local targetRoot = currentTarget.Character:FindFirstChild("HumanoidRootPart")
+        local myRoot = p.Character:FindFirstChild("HumanoidRootPart")
+        if targetRoot and myRoot then
+            myRoot.CFrame = targetRoot.CFrame + Vector3.new(5, 0, 0)
+        end
+    end
+end)
+
 -- البحث عن لاعب
 searchBox:GetPropertyChangedSignal("Text"):Connect(function()
     local text = searchBox.Text:lower()
@@ -301,7 +388,7 @@ searchBox:GetPropertyChangedSignal("Text"):Connect(function()
     end
 end)
 
--- كشف لاعب
+-- كشف لاعبين
 esp_btn.MouseButton1Click:Connect(function()
     states.esp = not states.esp
     esp_btn.BackgroundColor3 = states.esp and Color3.fromRGB(0, 200, 0) or Color3.fromRGB(50, 50, 50)
@@ -358,8 +445,6 @@ screen_btn.MouseButton1Click:Connect(function()
         local cam = workspace.CurrentCamera
         local targetRoot = currentTarget.Character:FindFirstChild("HumanoidRootPart")
         if targetRoot then
-            cam.CFrame = targetRoot.CFrame + targetRoot.CFrame.LookVector * 5
-            
             local loop
             loop = game:GetService("RunService").RenderStepped:Connect(function()
                 if not screenActive or not currentTarget or not currentTarget.Character then
