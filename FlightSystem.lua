@@ -198,26 +198,36 @@ playerName.TextSize = 11
 -- أزرار اللاعب على اليمين
 local esp_btn = makeBtn(playerRightPanel, "كشف لاعبين", 10)
 local screen_btn = makeBtn(playerRightPanel, "مشاهدة الشاشة", 50)
+local sit_mouth_btn = makeBtn(playerRightPanel, "في الفم", 90)
+local sit_knee_btn = makeBtn(playerRightPanel, "في الركبة", 130)
+
+makeLabel(playerRightPanel, "سرعة", 170)
+local sitSpeedBox = makeInputBox(playerRightPanel, "1-199", 195)
+sitSpeedBox.Text = "50"
 
 local end_btn = Instance.new("TextButton", playerRightPanel)
 end_btn.Size = UDim2.new(0.9, 0, 0, 35)
-end_btn.Position = UDim2.new(0.05, 0, 0, 90)
+end_btn.Position = UDim2.new(0.05, 0, 0, 235)
 end_btn.BackgroundColor3 = Color3.fromRGB(200, 0, 0)
 end_btn.TextColor3 = Color3.fromRGB(255, 255, 255)
 end_btn.Text = "إنهاء"
 end_btn.TextSize = 11
 end_btn.BorderSizePixel = 0
 
-local states = {fly = false, noclip = false, esp = false, screen = false}
+local states = {fly = false, noclip = false, esp = false, screen = false, sit = false}
 local cp = nil
 local currentTarget = nil
 local screenLoop = nil
 local originalCam = nil
+local sitLoop = nil
+local sitType = nil
+local mouthBasePos = nil
 
 -- المتغيرات الافتراضية
 local flySpeed = 50
 local jumpPower = 100
 local speed = 50
+local sitSpeed = 50
 
 -- دالة للتحقق من الرقم
 local function clampValue(val, min, max)
@@ -286,6 +296,18 @@ flySpeedBox.FocusLost:Connect(function()
     else
         flySpeedBox.Text = "50"
         flySpeed = 50
+    end
+end)
+
+sitSpeedBox.FocusLost:Connect(function()
+    local val = tonumber(sitSpeedBox.Text)
+    if val then
+        val = clampValue(val, 1, 199)
+        sitSpeed = val
+        sitSpeedBox.Text = tostring(val)
+    else
+        sitSpeedBox.Text = "50"
+        sitSpeed = 50
     end
 end)
 
@@ -384,6 +406,94 @@ tp_player_btn.MouseButton1Click:Connect(function()
             myRoot.CFrame = targetRoot.CFrame + Vector3.new(5, 0, 0)
         end
     end
+end)
+
+-- الجلوس في الفم (حركة أفقية داخل وخارج)
+sit_mouth_btn.MouseButton1Click:Connect(function()
+    if not currentTarget or not currentTarget.Character then return end
+    
+    if states.sit and sitType == "mouth" then
+        states.sit = false
+        if sitLoop then sitLoop:Disconnect() sitLoop = nil end
+        sit_mouth_btn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+        mouthBasePos = nil
+        return
+    end
+    
+    states.sit = true
+    sitType = "mouth"
+    sit_mouth_btn.BackgroundColor3 = Color3.fromRGB(147, 51, 234)
+    sit_knee_btn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+    
+    local myRoot = p.Character:FindFirstChild("HumanoidRootPart")
+    if not myRoot then return end
+    
+    if sitLoop then sitLoop:Disconnect() end
+    
+    sitLoop = game:GetService("RunService").RenderStepped:Connect(function()
+        if not states.sit or not currentTarget or not currentTarget.Character or sitType ~= "mouth" then
+            if sitLoop then sitLoop:Disconnect() sitLoop = nil end
+            mouthBasePos = nil
+            return
+        end
+        
+        local targetHead = currentTarget.Character:FindFirstChild("Head")
+        myRoot = p.Character:FindFirstChild("HumanoidRootPart")
+        
+        if targetHead and myRoot then
+            if not mouthBasePos then
+                mouthBasePos = targetHead.CFrame
+            end
+            
+            local time = tick()
+            local depthOffset = math.sin(time * sitSpeed / 10) * 1.2
+            myRoot.CFrame = mouthBasePos * CFrame.new(depthOffset, 0, 0)
+        end
+    end)
+end)
+
+-- الجلوس في الركبة (حركة أفقية داخل وخارج)
+sit_knee_btn.MouseButton1Click:Connect(function()
+    if not currentTarget or not currentTarget.Character then return end
+    
+    if states.sit and sitType == "knee" then
+        states.sit = false
+        if sitLoop then sitLoop:Disconnect() sitLoop = nil end
+        sit_knee_btn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+        mouthBasePos = nil
+        return
+    end
+    
+    states.sit = true
+    sitType = "knee"
+    sit_knee_btn.BackgroundColor3 = Color3.fromRGB(147, 51, 234)
+    sit_mouth_btn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+    
+    local myRoot = p.Character:FindFirstChild("HumanoidRootPart")
+    if not myRoot then return end
+    
+    if sitLoop then sitLoop:Disconnect() end
+    
+    sitLoop = game:GetService("RunService").RenderStepped:Connect(function()
+        if not states.sit or not currentTarget or not currentTarget.Character or sitType ~= "knee" then
+            if sitLoop then sitLoop:Disconnect() sitLoop = nil end
+            mouthBasePos = nil
+            return
+        end
+        
+        local targetLeg = currentTarget.Character:FindFirstChild("LeftLowerLeg") or currentTarget.Character:FindFirstChild("RightLowerLeg")
+        myRoot = p.Character:FindFirstChild("HumanoidRootPart")
+        
+        if targetLeg and myRoot then
+            if not mouthBasePos then
+                mouthBasePos = targetLeg.CFrame
+            end
+            
+            local time = tick()
+            local depthOffset = math.sin(time * sitSpeed / 10) * 1.2
+            myRoot.CFrame = mouthBasePos * CFrame.new(depthOffset, 0, 0)
+        end
+    end)
 end)
 
 -- البحث عن لاعب
@@ -489,18 +599,26 @@ screen_btn.MouseButton1Click:Connect(function()
     end
 end)
 
--- إنهاء مشاهدة الشاشة
+-- إنهاء
 end_btn.MouseButton1Click:Connect(function()
     states.screen = false
+    states.sit = false
     screen_btn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+    sit_mouth_btn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+    sit_knee_btn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
     panel.Visible = true
     if screenLoop then 
         screenLoop:Disconnect() 
         screenLoop = nil
     end
+    if sitLoop then
+        sitLoop:Disconnect()
+        sitLoop = nil
+    end
     if originalCam then
         workspace.CurrentCamera.CFrame = originalCam
     end
+    mouthBasePos = nil
 end)
 
 print("N7x تم تحميله!")
